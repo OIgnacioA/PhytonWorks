@@ -20,69 +20,72 @@ def Create():
     VALUES (?,?,?)""") 
     cursor.execute(S,[nombre,apellido,carrera])
     
-    texto.insert('1.0', "Alta exitosa" )   
+    texto.insert(0, "Alta exitosa" )   
     var = "Alta"
     BuscarTodo()
     con.commit()
     con.close()
 
-def BuscarTodo(): # tambien da respuesta en pamtalla en los otros casos. 
+def BuscarTodo(): # tambien da respuesta en pantalla en los otros casos. 
     global var 
-    texto.delete("1.0","end")
+    texto.delete(0,"end")
     Limpiar()
     con=sql.connect("colegio.db")
     cursor=con.cursor()
-
+    num = 0
     if (var == ""):
 
         cursor.execute("""SELECT * FROM ALUMNO""")
         for i in cursor:
             
-            texto.insert('1.0', i )
-            texto.insert('1.0', "\n")
+            texto.insert(num, i)
+            num= num+1
+    
+            
 
     elif(var == "Alta" ):
 
-       texto.insert('1.0', "Agregado con exito!" )
+       texto.insert( 0, "Agregado con exito!" )
        
 
     elif(var == "update" ):
 
-       texto.insert('1.0', "Update exitoso!" )
+       texto.insert(0, "Update exitoso!" )
 
     var =""      
     con.commit()
     con.close()
 
 def Buscar():
-    texto.delete("1.0","end")
-    Limpiar()
+    texto.delete(0,"end")
     con=sql.connect("colegio.db")
     cursor=con.cursor()
+    num= 0 
     contenido = ""
     nombre=entry1.get()
     apellido=entry2.get()
     carrera=entry3.get()
 
-
+    Limpiar()
+    
     if ((nombre == '*') and (apellido != '*') and (carrera == "")):
-       
+      
         instruccion = "SELECT * FROM ALUMNO where apellido =" + "'" + apellido + "'"
         cursor.execute(instruccion)
         
         for i in cursor:
-             contenido = i
-             texto.insert('1.0', i )
-             texto.insert('1.0', "\n")
+            num = num+1
+            contenido = i
+            texto.insert(num, i )
+            
         
-        txt = texto.get('1.0',tk.END)    
-        print(txt) 
+       # txt = texto.get('1.0',tk.END)    
+  
       
 
         if (cursor==0):
             contenido = i
-            print("jolow")
-            texto.insert('1.0', "no se encuentrar registros con estos datos" )     
+            texto.insert(0, "no se encuentran registros con estos datos" )     
        
 
     elif ((nombre != '*') and (apellido == '*')and (carrera == "")):
@@ -91,58 +94,62 @@ def Buscar():
         cursor.execute(instruccion)
         
         for i in cursor:
-             contenido = i
-             texto.insert('1.0', i )
-             texto.insert('1.0', "\n")
+            num = num+1
+            contenido = i
+            texto.insert(num, i )
+         
 
-        txt = texto.get('1.0',tk.END)     
-        print(txt) 
+       # txt = texto.get('1.0',tk.END)     
+  
        
         if (cursor==0):
-            print("jolow")
-            texto.insert('1.0', "no se encuentrar registros con estos datos" )     
+            
+            texto.insert(0, "no se encuentran registros con estos datos" )     
       
       
 
-    elif ((nombre == '*') and (apellido == '*')and (carrera == "")):
-
+    elif ((nombre == '*') and (apellido == '*') and (carrera == "")):
+        num = 0
         instruccion = "SELECT * FROM ALUMNO "
         cursor.execute(instruccion)
         
         for i in cursor:
-             contenido = i
-             texto.insert('1.0', i )
-             texto.insert('1.0', "\n")
+            num = num+1
+            contenido = i
+            texto.insert(num, i )
 
-        txt = texto.get('1.0',tk.END)     
+       # txt = texto.get('1.0',tk.END)     
         print(txt) 
     
         if (cursor== 0):
-            print("jolow")
-            texto.insert('1.0', "no se encuentrar registros con estos datos" )
+      
+            texto.insert( 0 , "no se encuentran registros con estos datos" )
 
     elif (((nombre == '') or (apellido == '') or (nombre == '*') or (apellido == '*')) and (carrera != '') ):
-
+        num = 0
         instruccion = "SELECT * FROM ALUMNO where carrera = " + "'" + carrera + "'" 
         cursor.execute(instruccion)
-        
-    
 
         for i in cursor:
+            num = num+1
             contenido = i
-            texto.insert('1.0', i )
-            texto.insert('1.0', "\n")
+            texto.insert(num, i )
     
-        txt = texto.get('1.0',tk.END)     
-        print(txt) 
+        #txt = texto.get('1.0',tk.END)     
+        
         print(cursor.fetchall())
 
     if(contenido == ""):
            
-        texto.insert('1.0', "no se encuentrar registros" )
+        texto.insert(0, "no se encuentran registros" )
 
     con.commit()
     con.close()
+
+
+
+
+
 
 def Update():
     global var 
@@ -170,7 +177,7 @@ def Delete():
     instruccion = "DELETE FROM ALUMNO where id_alumno=" + "'" + id_alumno + "'"
     cursor.execute(instruccion)
 
-    texto.insert('1.0', "Legajo: " + id_alumno + "borrado" )
+    texto.insert(0, "Legajo: " + id_alumno + "borrado" )
     con.commit()
     con.close()
     Limpiar()
@@ -180,7 +187,7 @@ def Delete():
 
 def traer():
     Limpiar()
-    texto.delete("1.0","end")
+    texto.delete(0,"end")
     con=sql.connect("colegio.db")
     cursor=con.cursor()
 
@@ -195,7 +202,7 @@ def traer():
     
 def Limpiar():
     
-    texto.delete("1.0","end")
+    texto.delete(0,"end")
     entry1.delete("0","end")
     entry2.delete("0","end")
     entry3.delete("0","end")
@@ -207,9 +214,10 @@ root = tk.Tk()
 root.title("Ventana de Ejemplo")
 root.geometry("400x550")
 
-texto = tk.Text(root)
+texto = tk.Listbox(root, width="50", height="10")
 texto.pack()
-texto.config(width=50, height=10, font=("Consolas",12),padx=15, pady=15, selectbackground="red")
+
+
 
 #   Etiquetas -----------------------------
 
